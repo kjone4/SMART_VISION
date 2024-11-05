@@ -1,5 +1,6 @@
 #include "opencv2/opencv.hpp"
 #include <iostream>
+#include<time.h>
 using namespace cv;
 using namespace std;
 int main()
@@ -39,7 +40,9 @@ int main()
     if(!writer3.isOpened()) {cerr<<"Writer open failed!"<<endl; return -1;}
 
     Mat frame, gray, thred;
+    TickMeter tm;	// 객체 생성
     while (true) {
+        tm.start();	// 측정 시작
       	source >> frame;
         	if (frame.empty()){ cerr << "frame empty!" << endl; break; }
 
@@ -50,6 +53,9 @@ int main()
 	    writer2 << gray;
         writer3 << thred;
 	    waitKey(30);
+        tm.stop();	// 측정 종료
+        cout << "Image inverse took " << tm.getTimeMilli() << "ms." << endl;
+        tm.reset();
     }
     return 0;
 }
