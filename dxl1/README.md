@@ -7,3 +7,7 @@ dxl2 다이나믹셀
 
 급가속 급감속 해결  
 코드 작성해서 천천히 해당 속도에 도달하도록 설정  
+
+![image](https://github.com/user-attachments/assets/d0463e58-6f5b-43c4-9af0-86ffb055c759)
+
+  
