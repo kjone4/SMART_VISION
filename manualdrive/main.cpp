@@ -59,13 +59,22 @@ int main(void)
         if (mx.kbhit()) {
             char c = mx.getch();
             switch(c) {
-                case 's': goal1 = 0; goal2 = 0; break;
+                case 'r': goal1 = 0; goal2 = 0; break;//정지
+
                 case ' ': goal1 = 0; goal2 = 0; break;
-                case 'f': goal1 = 50; goal2 = -50; break;
-                case 'b': goal1 = -50; goal2 = 50; break;
-                case 'l': goal1 = -50; goal2 = -50; break;
-                case 'r': goal1 = 50; goal2 = 50; break;
+
+                case 'w': goal1 += 50; goal2 += -50; break;//전진
+
+                case 's': goal1 += -50; goal2 += 50; break;//후진
+
+                case 'a': goal1 = -50; goal2 = -50; break;//좌회전
+                case 'd': goal1 = 50; goal2 = 50; break;//우회전
+
+                case 'e': goal1 += 10; break; //대각좌
+                case 'q': goal2 += -10; break; //대각우
+
                 default : goal1 = 0; goal2 = 0; break;
+
                 }
             }
 // generate accel and decel motion
