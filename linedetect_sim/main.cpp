@@ -2,6 +2,7 @@
 #include <iostream>
 using namespace cv;
 using namespace std;
+
 int main()
 {
     /*
@@ -12,7 +13,7 @@ int main()
 	width=(int)640, height=(int)360, format=(string)BGRx ! \
 	videoconvert ! video/x-raw, format=(string)BGR ! appsink"; 
     */
-    VideoCapture source("/home/jetson/workspace/linedetect_sim/5_lt_cw_100rpm_out.mp4"); 
+    VideoCapture source("/home/jetson/workspace/linedetect_sim/7_lt_ccw_100rpm_in.mp4"); 
     if (!source.isOpened()){ cout << "Camera error" << endl; return -1; }
 
     string dst0 = "appsrc ! videoconvert ! video/x-raw, format=BGRx ! \
@@ -35,10 +36,11 @@ int main()
 	nvvidconv ! nvv4l2h264enc insert-sps-pps=true ! \
 	h264parse ! rtph264pay pt=96 ! \
 	udpsink host=203.234.58.167 port=8002 sync=false";
-    VideoWriter writer2(dst2,0, (double)30,Size(640,360),false);
+    VideoWriter writer2(dst2,0, (double)30,Size(640,90),true);
     if(!writer2.isOpened()) {cerr<<"Writer open failed!"<<endl; return -1;}
 
-Mat frame, gray, thred, cutthred; // 영상 객체
+
+    Mat frame, gray, thred, cutthred; // 영상 객체
     TickMeter tm;                     // 시간 측정 객체 생성
 
     Mat labels, stats, centroids;
@@ -103,7 +105,7 @@ Mat frame, gray, thred, cutthred; // 영상 객체
         writer1 << thred;    // 이진화
         writer2 << cutthred; // 하단 1/4 이진화
 
-        waitKey(30); // ESC 키로 종료
+        waitKey(20); //delay 20으로 하면 프로그램 30 걸림
         tm.stop();
         cout << "err: " << err;
         cout << " time: " << tm.getTimeMilli() << " ms." << endl;
