@@ -1,7 +1,15 @@
 #include "opencv2/opencv.hpp"
 #include <iostream>
+#include <unistd.h>
+#include <sys/time.h>
+#include <signal.h>
+#include "dxl.hpp"
 using namespace cv;
 using namespace std;
+bool ctrl_c_pressed = false;
+void ctrlc_handler(int){ ctrl_c_pressed = true; }
+bool mode = false;
+double k = 0.5;
 
 int main()
 {
@@ -39,14 +47,20 @@ int main()
     VideoWriter writer2(dst2,0, (double)30,Size(640,90),true);
     if(!writer2.isOpened()) {cerr<<"Writer open failed!"<<endl; return -1;}
 
-
-    Mat frame, gray, thred, cutthred; // 영상 객체
     TickMeter tm;                     // 시간 측정 객체 생성
-
+    signal(SIGINT, ctrlc_handler);
+    
+    // 영상 객체
+    Mat frame, gray, thred, cutthred;
     Mat labels, stats, centroids;
-    int target;
+    int target; // 따라갈 선
     Point center(320, 45); // 초기 중심점 설정 (하단 영상 중앙)
-    int err;// 위치오차
+    int error;// 위치오차
+
+    // dxl 객체
+    Dxl mx;
+    int lvel = 0, rvel = 0;
+    if(!mx.open()) { cout << "dynamixel open error"<<endl; return -1; }
 
     while (true) {
 
@@ -96,7 +110,8 @@ int main()
             rectangle(cutthred, Rect(p[0], p[1], p[2], p[3]), Scalar(255, 0, 0), 2);
             if(i == target){
                 rectangle(cutthred, Rect(p[0], p[1], p[2], p[3]), Scalar(0, 0, 255), 2);
-                err = (cutthred.cols/2) - centroids.at<double>(target, 0);
+                circle(cutthred, center, 5, Scalar(0,0,255), -1);
+                error = (cutthred.cols/2) - centroids.at<double>(target, 0);
             }
         }
 
@@ -104,13 +119,28 @@ int main()
         writer0 << frame;    // 컬러 원본
         writer1 << thred;    // 이진화
         writer2 << cutthred; // 하단 1/4 이진화
+         // 라인검출코드-> error 계산
+        if(mx.kbhit())// 없으면제어멈춤
+        { 
+            char ch= mx.getch();
+            if(ch== 'q') break;
+            else if(ch== 's') {
+                mode= true;
+            }
+        }
+        lvel= 100 -k*error;
+        rvel= -(100 + k*error); 
+        if(mode) {
+            mx.setVelocity(lvel, rvel);
+        }
+        if (ctrl_c_pressed) break; //Ctrl+c입력시 탈출
 
-        waitKey(20); //delay 20으로 하면 프로그램 30 걸림
-        tm.stop();
-        cout << "err: " << err;
+        usleep(20*1000);
+        cout << "err: " << error;
         cout << " time: " << tm.getTimeMilli() << " ms." << endl;
-        tm.reset();
-       
+        tm.stop();
+        tm.reset();  
     }
+    mx.close(); // 장치닫기
     return 0;
 }
