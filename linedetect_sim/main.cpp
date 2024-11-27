@@ -100,6 +100,10 @@ int main()
             center.x = centroids.at<double>(target, 0);
             center.y = centroids.at<double>(target, 1);
         }
+        else if (target == 0) {
+            circle(cutthred, center, 50, Scalar(0,0,255), -1);
+            cout << "circle mia" << endl;
+        }
         
         // 시각화
         cvtColor(cutthred, cutthred, COLOR_GRAY2BGR);
@@ -128,17 +132,21 @@ int main()
                 mode= true;
             }
         }
+
         lvel= 100 -k*error;
+        if(lvel < 0){
+            lvel = 10;
+        }
         rvel= -(100 + k*error); 
         if(mode) {
             mx.setVelocity(lvel, rvel);
         }
         if (ctrl_c_pressed) break; //Ctrl+c입력시 탈출
 
-        usleep(20*1000);
+        waitKey(15);
         cout << "err: " << error;
-        cout << " time: " << tm.getTimeMilli() << " ms." << endl;
         tm.stop();
+        cout << " time: " << tm.getTimeMilli() << " ms." << endl;
         tm.reset();  
     }
     mx.close(); // 장치닫기
