@@ -9,7 +9,7 @@ using namespace std;
 bool ctrl_c_pressed = false;
 void ctrlc_handler(int){ ctrl_c_pressed = true; }
 bool mode = false;
-double k = 0.5;
+double k = 0.25;
 
 int main()
 {
@@ -23,7 +23,8 @@ int main()
     */
     VideoCapture source("/home/jetson/workspace/linedetect_sim/7_lt_ccw_100rpm_in.mp4"); 
     if (!source.isOpened()){ cout << "Camera error" << endl; return -1; }
-
+    ///home/jetson/workspace/linedetect_sim/5_lt_cw_100rpm_out.mp4
+    ///home/jetson/workspace/linedetect_sim/7_lt_ccw_100rpm_in.mp4
     string dst0 = "appsrc ! videoconvert ! video/x-raw, format=BGRx ! \
 	nvvidconv ! nvv4l2h264enc insert-sps-pps=true ! \
 	h264parse ! rtph264pay pt=96 ! \
@@ -80,16 +81,15 @@ int main()
         int labeling = connectedComponentsWithStats(cutthred, labels, stats, centroids);
 
         double closest = DBL_MAX;
-
         target = 0;
         for (int i = 1; i < labeling; ++i) {
             if (stats.at<int>(i,4) < 50) continue; // 작은 영역 제외
 
             double dx = center.x - centroids.at<double>(i, 0);
             double dy = center.y - centroids.at<double>(i, 1);
-            double distance = sqrt(pow(dx, 2) + pow(dy, 2)); // 거리 계산
+            double distance = (pow(dx, 2) + pow(dy, 2)); // 거리 계산
 
-            if (distance < closest && distance < 75) {
+            if (distance < closest && distance < 5625) { // 75*75
                 closest = distance;
                 target = i;
             }
@@ -99,10 +99,6 @@ int main()
         if (target > 0) {
             center.x = centroids.at<double>(target, 0);
             center.y = centroids.at<double>(target, 1);
-        }
-        else if (target == 0) {
-            circle(cutthred, center, 50, Scalar(0,0,255), -1);
-            cout << "circle mia" << endl;
         }
         
         // 시각화
@@ -117,13 +113,17 @@ int main()
                 circle(cutthred, center, 5, Scalar(0,0,255), -1);
                 error = (cutthred.cols/2) - centroids.at<double>(target, 0);
             }
+            else if( target == 0 ){
+                circle(cutthred, center, 5, Scalar(0,0,255), -1);
+                //cout << "line mia" << endl;
+            }
         }
 
         // 출력 스트림에 쓰기
         writer0 << frame;    // 컬러 원본
         writer1 << thred;    // 이진화
         writer2 << cutthred; // 하단 1/4 이진화
-         // 라인검출코드-> error 계산
+
         if(mx.kbhit())// 없으면제어멈춤
         { 
             char ch= mx.getch();
@@ -137,15 +137,17 @@ int main()
         if(lvel < 0){
             lvel = 10;
         }
-        rvel= -(100 + k*error); 
+        rvel= -(100 + k*error);
         if(mode) {
             mx.setVelocity(lvel, rvel);
         }
         if (ctrl_c_pressed) break; //Ctrl+c입력시 탈출
 
         waitKey(15);
-        cout << "err: " << error;
         tm.stop();
+        cout << "err: " << error;
+        cout << " rvel: " << rvel;
+        cout << " lvel: " << lvel;
         cout << " time: " << tm.getTimeMilli() << " ms." << endl;
         tm.reset();  
     }
