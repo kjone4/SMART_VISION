@@ -9,7 +9,7 @@ using namespace std;
 bool ctrl_c_pressed = false;
 void ctrlc_handler(int){ ctrl_c_pressed = true; }
 bool mode = false;
-double k = 0.25;
+double k = 0.15;
 
 int main()
 {
@@ -89,7 +89,7 @@ int main()
             double dy = center.y - centroids.at<double>(i, 1);
             double distance = (pow(dx, 2) + pow(dy, 2)); // 거리 계산
 
-            if (distance < closest && distance < 5625) { // 75*75
+            if (distance < closest && distance < 5625) { // 75*75 = 5625
                 closest = distance;
                 target = i;
             }
@@ -143,11 +143,11 @@ int main()
         }
         if (ctrl_c_pressed) break; //Ctrl+c입력시 탈출
 
-        waitKey(15);
+        waitKey(20);
         tm.stop();
         cout << "err: " << error;
-        cout << " rvel: " << rvel;
         cout << " lvel: " << lvel;
+        cout << " rvel: " << rvel;
         cout << " time: " << tm.getTimeMilli() << " ms." << endl;
         tm.reset();  
     }
