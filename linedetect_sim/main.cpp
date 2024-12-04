@@ -111,7 +111,7 @@ int main()
         tm.stop();
         double injury_time = 30 - tm.getTimeMilli(); // 모자란 시간
         if(injury_time < 0){injury_time = -injury_time;}
-        usleep(injury_time * 1000);
+        else usleep(injury_time * 1000);
         cout << "err: " << error;
         cout << " lvel: " << lvel;
         cout << " rvel: " << rvel;
