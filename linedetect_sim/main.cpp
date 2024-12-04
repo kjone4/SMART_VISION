@@ -1,13 +1,9 @@
-#include "opencv2/opencv.hpp"
-#include <iostream>
-#include <unistd.h>
-#include <sys/time.h>
-#include <signal.h>
+#include "vision.hpp"
 #include "dxl.hpp"
-using namespace cv;
-using namespace std;
+
 bool ctrl_c_pressed = false;
 void ctrlc_handler(int){ ctrl_c_pressed = true; }
+
 bool mode = false;
 double k = 0.15;
 
@@ -25,6 +21,8 @@ int main()
     if (!source.isOpened()){ cout << "Camera error" << endl; return -1; }
     ///home/jetson/workspace/linedetect_sim/5_lt_cw_100rpm_out.mp4
     ///home/jetson/workspace/linedetect_sim/7_lt_ccw_100rpm_in.mp4
+
+
     string dst0 = "appsrc ! videoconvert ! video/x-raw, format=BGRx ! \
 	nvvidconv ! nvv4l2h264enc insert-sps-pps=true ! \
 	h264parse ! rtph264pay pt=96 ! \
@@ -52,7 +50,7 @@ int main()
     signal(SIGINT, ctrlc_handler);
     
     // 영상 객체
-    Mat frame, gray, thred, cutthred;
+    Mat frame, cutthred;
     Mat labels, stats, centroids;
     int target; // 따라갈 선
     Point center(320, 45); // 초기 중심점 설정 (하단 영상 중앙)
@@ -72,10 +70,7 @@ int main()
         if (frame.empty()){ cerr << "frame empty!" << endl; break; }
 
         // 이진화
-        cvtColor(frame, gray, COLOR_BGR2GRAY);
-        gray += 100 - mean(gray)[0]; // 영상 밝기 조정
-        threshold(gray, thred, 0, 255, THRESH_BINARY | THRESH_OTSU);
-        thred(Rect(0, 270, 640, 90)).copyTo(cutthred); // 하단 1/4 크기만 추출
+        cutthred = processFrame(frame);
 
         // 레이블링
         int labeling = connectedComponentsWithStats(cutthred, labels, stats, centroids);
@@ -121,7 +116,7 @@ int main()
 
         // 출력 스트림에 쓰기
         writer0 << frame;    // 컬러 원본
-        writer1 << thred;    // 이진화
+        //writer1 << thred;    // 이진화
         writer2 << cutthred; // 하단 1/4 이진화
 
         if(mx.kbhit())// 없으면제어멈춤
