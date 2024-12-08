@@ -55,6 +55,7 @@ int main()
     int target; // 따라갈 객체
     Point center(320, 45); // 초기 중심점 설정 (하단 영상 중앙)
     int error;// 위치오차
+    double closest = DBL_MAX;
 
     // dxl 객체
     Dxl mx;
@@ -75,7 +76,7 @@ int main()
         // 레이블링
         int labeling = connectedComponentsWithStats(cutthred, labels, stats, centroids);
 
-        double closest = DBL_MAX;
+        closest = DBL_MAX;
         target = 0;
         get_target(labeling, stats, center, centroids, closest, target, error, cutthred);
         
