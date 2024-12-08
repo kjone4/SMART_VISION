@@ -10,7 +10,7 @@ Mat processFrame(Mat frame) {
     return cutthred;
 }
 
-void get_target(int labeling, Mat stats, Point& center, Mat centroids, double& closest, int& target){
+void get_target(int labeling, Mat stats, Point& center, Mat centroids, double& closest, int& target, int& error, Mat cutthred){
     for (int i = 1; i < labeling; ++i) {
             if (stats.at<int>(i,4) < 50) continue; // 작은 영역 제외
 
@@ -28,10 +28,11 @@ void get_target(int labeling, Mat stats, Point& center, Mat centroids, double& c
         if (target > 0) {
             center.x = centroids.at<double>(target, 0);
             center.y = centroids.at<double>(target, 1);
+            error = (cutthred.cols/2) - centroids.at<double>(target, 0);
         }
 }
 
-void draw_target(int labeling, Mat stats, Mat& cutthred, int target, Point center, int& error, Mat centroids){
+void draw_target(int labeling, Mat stats, Mat& cutthred, int target, Point center, Mat centroids){
     for (int i = 1; i < labeling; ++i) {
             int* p = stats.ptr<int>(i);
             if (stats.at<int>(i,4) < 50) continue;
@@ -39,7 +40,6 @@ void draw_target(int labeling, Mat stats, Mat& cutthred, int target, Point cente
             if(i == target){
                 rectangle(cutthred, Rect(p[0], p[1], p[2], p[3]), Scalar(0, 0, 255), 2);
                 circle(cutthred, center, 5, Scalar(0,0,255), -1);
-                error = (cutthred.cols/2) - centroids.at<double>(target, 0);
             }
             else if( target == 0 ){
                 circle(cutthred, center, 5, Scalar(0,0,255), -1);
