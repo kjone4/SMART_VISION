@@ -2,7 +2,9 @@
 
 화면에 보이는 라인을 따라서 추적하는 프로그램
 
-### 코드 설명
+### 코드 설명       
+
+#### 화면 처리
 ```
 // 이진화
        Mat processFrame(Mat frame) {
@@ -14,11 +16,11 @@
     return cutthred;
 }
 ```
-화면 이진화
 
+#### 목표설정, error값
 ```
 // 목표 설정
-void get_target(int labeling, Mat stats, Point& center, Mat centroids, double& closest, int& target){
+void get_target(int labeling, Mat stats, Point& center, Mat centroids, double& closest, int& target, int& error, Mat cutthred){
     for (int i = 1; i < labeling; ++i) {
             if (stats.at<int>(i,4) < 50) continue; // 작은 영역 제외
 
@@ -36,14 +38,15 @@ void get_target(int labeling, Mat stats, Point& center, Mat centroids, double& c
         if (target > 0) {
             center.x = centroids.at<double>(target, 0);
             center.y = centroids.at<double>(target, 1);
+            error = (cutthred.cols/2) - centroids.at<double>(target, 0);
         }
 }
 ```
-타겟 설정
 
+#### 목표 화면에 표시
 ```
 //박스 그리기
-void draw_target(int labeling, Mat stats, Mat& cutthred, int target, Point center, int& error, Mat centroids){
+void draw_target(int labeling, Mat stats, Mat& cutthred, int target, Point center, Mat centroids){
     for (int i = 1; i < labeling; ++i) {
             int* p = stats.ptr<int>(i);
             if (stats.at<int>(i,4) < 50) continue;
@@ -51,7 +54,6 @@ void draw_target(int labeling, Mat stats, Mat& cutthred, int target, Point cente
             if(i == target){
                 rectangle(cutthred, Rect(p[0], p[1], p[2], p[3]), Scalar(0, 0, 255), 2);
                 circle(cutthred, center, 5, Scalar(0,0,255), -1);
-                error = (cutthred.cols/2) - centroids.at<double>(target, 0);
             }
             else if( target == 0 ){
                 circle(cutthred, center, 5, Scalar(0,0,255), -1);
@@ -60,4 +62,3 @@ void draw_target(int labeling, Mat stats, Mat& cutthred, int target, Point cente
         }
 }
 ```
-박스그리기
