@@ -11,6 +11,8 @@ Mat processFrame(Mat frame) {
 }
 
 void get_target(int labeling, Mat stats, Point& center, Mat centroids, double& closest, int& target, int& error, Mat cutthred){
+    closest = DBL_MAX;
+    target = 0;
     for (int i = 1; i < labeling; ++i) {
             if (stats.at<int>(i,4) < 50) continue; // 작은 영역 제외
 
