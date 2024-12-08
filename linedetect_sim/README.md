@@ -70,22 +70,3 @@ void draw_target(int labeling, Mat stats, Mat& cutthred, int target, Point cente
 1. 감지된 객체들에 대해서 파란색 사각형
 2. 타겟 번호와 일치하는 객체는 빨간색, 중심점 표시
 3. 추적중인 객체가 없다면 이전 중심값을 화면에 표시
-       
-#### 시간 처리
-```
-tm.start();
-.
-.
-.
-tm.stop();
-double injury_time = 30 - tm.getTimeMilli(); // 모자란 시간
-if(injury_time < 0){injury_time = -injury_time;}
-else usleep(injury_time * 1000);
-cout << " time: " << tm.getTimeMilli() + injury_time << " ms." << endl;
-tm.reset();
-```
-1. 프로그램이 실행된 시간 측정
-2. 추가해야 될 시간 = 30 - 실행 시간
-3. 추가 시간만큼 usleep
-4. 실행 시간 + 추가 시간 = 30 출력
-5. 만약 실행 시간이 30ms 보다 크다면 usleep X
