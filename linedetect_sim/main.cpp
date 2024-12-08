@@ -76,8 +76,6 @@ int main()
         // 레이블링
         int labeling = connectedComponentsWithStats(cutthred, labels, stats, centroids);
 
-        closest = DBL_MAX;
-        target = 0;
         get_target(labeling, stats, center, centroids, closest, target, error, cutthred);
         
         // 시각화
