@@ -77,12 +77,12 @@ int main()
 
         double closest = DBL_MAX;
         target = 0;
-        get_target(labeling, stats, center, centroids, closest, target);
+        get_target(labeling, stats, center, centroids, closest, target, error, cutthred);
         
         // 시각화
         cvtColor(cutthred, cutthred, COLOR_GRAY2BGR);
 
-        draw_target(labeling, stats, cutthred, target, center, error, centroids);
+        draw_target(labeling, stats, cutthred, target, center, centroids);
 
         // 출력 스트림에 쓰기
         writer0 << frame;    // 컬러 원본
