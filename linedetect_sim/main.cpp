@@ -5,7 +5,8 @@ bool ctrl_c_pressed = false;
 void ctrlc_handler(int){ ctrl_c_pressed = true; }
 
 bool mode = false;
-double k = 0.15;
+#define UNDER200 0.2
+#define OVER200 0.7
 
 int main()
 {
@@ -84,11 +85,7 @@ int main()
                 mode= true;
             }
         }
-        lvel= 100 -k*error;
-        if(lvel < 0){
-            lvel = 10;
-        }
-        rvel= -(100 + k*error);
+        get_Velocity( lvel, rvel, error, UNDER200, OVER200);
         if(mode) {
             mx.setVelocity(lvel, rvel);
         }
