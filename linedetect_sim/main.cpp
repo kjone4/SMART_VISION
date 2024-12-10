@@ -7,7 +7,7 @@ void ctrlc_handler(int){ ctrl_c_pressed = true; }
 bool mode = false;
 #define UNDER200 0.2
 #define OVER200 0.7
-
+#define RPM 100
 int main()
 {
     /*
@@ -85,7 +85,7 @@ int main()
                 mode= true;
             }
         }
-        get_Velocity( lvel, rvel, error, UNDER200, OVER200);
+        get_Velocity( lvel, rvel, error, UNDER200, OVER200, RPM);
         if(mode) {
             mx.setVelocity(lvel, rvel);
         }
