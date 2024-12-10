@@ -50,24 +50,23 @@ void draw_target(int labeling, Mat stats, Mat& cutthred, int target, Point cente
         }
 }
 
-void get_Velocity( int& lvel, int& rvel, int error, double UNDER200, double OVER200){
-    
+void get_Velocity( int& lvel, int& rvel, int error, double UNDER200, double OVER200, int RPM){
     if( error >= 200  || error <= -200 ){
-        lvel= 100 - OVER200*error;
+        lvel= RPM - OVER200*error;
         if(lvel < 0){
             lvel = 10;
         }
-        rvel= -(100 + OVER200*error);
+        rvel= -(RPM + OVER200*error);
         if(rvel > 0){
             rvel = -10;
         }
     }
     else{
-        lvel= 100 - UNDER200*error;
+        lvel= RPM - UNDER200*error;
         if(lvel < 0){
             lvel = 10;
         }
-        rvel= -(100 + UNDER200*error);
+        rvel= -(RPM + UNDER200*error);
         if(rvel > 0){
             rvel = -10;
         }
