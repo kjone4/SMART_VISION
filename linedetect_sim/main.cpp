@@ -5,23 +5,25 @@ bool ctrl_c_pressed = false;
 void ctrlc_handler(int){ ctrl_c_pressed = true; }
 
 bool mode = false;
-#define UNDER200 0.2
-#define OVER200 0.7
-#define RPM 100
+#define UNDER200 0.27
+#define OVER200 0.27
+#define RPM 200
 int main()
 {
-    /*
+    
     string src = "nvarguscamerasrc sensor-id=0 ! \
 	video/x-raw(memory:NVMM), width=(int)640, height=(int)360, \
     format=(string)NV12, framerate=(fraction)30/1 ! \
 	nvvidconv flip-method=0 ! video/x-raw, \
 	width=(int)640, height=(int)360, format=(string)BGRx ! \
 	videoconvert ! video/x-raw, format=(string)BGR ! appsink"; 
-    */
-    VideoCapture source("/home/jetson/workspace/linedetect_sim/5_lt_cw_100rpm_out.mp4"); 
+    
+    
+    VideoCapture source(src); 
     if (!source.isOpened()){ cout << "Camera error" << endl; return -1; }
     ///home/jetson/workspace/linedetect_sim/5_lt_cw_100rpm_out.mp4
     ///home/jetson/workspace/linedetect_sim/7_lt_ccw_100rpm_in.mp4
+    
 
     string dst0 = "appsrc ! videoconvert ! video/x-raw, format=BGRx ! \
 	nvvidconv ! nvv4l2h264enc insert-sps-pps=true ! \
@@ -46,7 +48,7 @@ int main()
 
     TickMeter tm;                  // 시간 측정 객체 생성
     signal(SIGINT, ctrlc_handler); //시그널핸들러
-    
+
     Mat frame, cutthred;
     Mat labels, stats, centroids;
     int target; // 따라갈 객체
@@ -68,7 +70,7 @@ int main()
         int labeling = connectedComponentsWithStats(cutthred, labels, stats, centroids);
 
         get_target(labeling, stats, center, centroids, closest, target, error, cutthred);
-        
+
         cvtColor(cutthred, cutthred, COLOR_GRAY2BGR);
 
         draw_target(labeling, stats, cutthred, target, center, centroids);
@@ -92,11 +94,11 @@ int main()
         if (ctrl_c_pressed) break; //Ctrl+c입력시 탈출
 
         tm.stop();
-        double injury_time = 30 - tm.getTimeMilli(); // 모자란 시간
-        if(injury_time < 0){injury_time = -injury_time;}
-        else usleep(injury_time * 1000);
+        //double injury_time = 30 - tm.getTimeMilli(); // 모자란 시간
+        //if(injury_time < 0){injury_time = -injury_time;}
+        //else usleep(injury_time * 1000);
         cout << "err: " << error << " lvel: " << lvel << " rvel: " << rvel;
-        cout << " time: " << tm.getTimeMilli() + injury_time << " ms." << endl;
+        cout << " time: " << tm.getTimeMilli() << " ms." << endl;//+ injury_time 
         tm.reset();  
     }
     mx.close(); // 장치닫기
