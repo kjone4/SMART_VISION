@@ -28,6 +28,7 @@ void get_target2(int labeling, Mat stats, Point& center2, Mat centroids, double&
 ```
 기존 라인 트레이서에서 목표물을 추가하여 2개의 선을 찾도록 개선
 
+#### 제어
 ```
 mid = (error + error2) / 2;
 ```
